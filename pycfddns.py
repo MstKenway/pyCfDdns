@@ -17,6 +17,7 @@ details[to get zone id] and to read account information[to get account id to get
 3. python3 pycfddns.py -token
 4. set a timing function to check the current ip periodically.(like using crond)
 """
+import datetime
 import json
 import re
 import socket
@@ -165,6 +166,7 @@ def get_record_id_by_token(z_id: str, rec_name: str):
 
 def log_to_file(line: str):
     with open(log_file, "a") as f:
+        f.write(str(datetime.datetime.now())+ "\t")
         f.write(line)
         f.write("\n")
 
