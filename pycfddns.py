@@ -118,8 +118,7 @@ def get_account_id_by_token(acc_name: str) -> str:
     try:
         with request.urlopen(req) as resp:
             content_raw = resp.read()
-            print(content_raw)
-            content = json.loads(content_raw)
+        content = json.loads(content_raw)
         for item in content['result']:
             if acc_name in item['name']:
                 return item['id']
@@ -137,7 +136,6 @@ def get_zone_id_by_token(z_name: str, acc_name, acc_id):
     try:
         with  request.urlopen(req) as resp:
             content_raw = resp.read()
-        print(content_raw)
         content = json.loads(content_raw)
         for item in content['result']:
             if z_name == item['name']:
@@ -156,7 +154,6 @@ def get_record_id_by_token(z_id: str, rec_name: str):
     try:
         with  request.urlopen(req) as resp:
             content_raw = resp.read()
-        print(content_raw)
         content = json.loads(content_raw)
         for item in content['result']:
             if rec_name == item['name']:
