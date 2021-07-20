@@ -44,3 +44,12 @@ details[to get zone id] and to read account information[to get account id to get
   ```shell
   */2 * * * * python3 /etc/pycfddns/pycfddns.py > /dev/null 2>&1
   ```
+---
+附上[生成Token教程](https://support.cloudflare.com/hc/zh-cn/articles/200167836-%E7%AE%A1%E7%90%86-API-%E4%BB%A4%E7%89%8C%E5%92%8C%E5%AF%86%E9%92%A5)   
+选择DNS模板  
+需要：  
+1. 区域 DNS 编辑（必须）
+2. 区域 区域 读取
+3. 账户 账户设置 读取
+
+如果给了zone id，后两个权限就不用了。zone id 可以在DashBoard-账户-概述 的右侧栏中找到，zone id 下方就是account id。
