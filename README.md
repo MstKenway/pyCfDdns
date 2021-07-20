@@ -32,9 +32,9 @@ details[to get zone id] and to read account information[to get account id to get
   wget https://raw.githubusercontent.com/MstKenway/pyCfDdns/main/pycfddns.py -O /etc/pycfddns/pycfddns.py
   
   ```
-4. 执行
+3. 执行
 
-    python3 pycfddns.py -token
+      python3 pycfddns.py -token
 4. 设置定时任务
   ```shell
   crontab -e
