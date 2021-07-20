@@ -33,9 +33,9 @@ details[to get zone id] and to read account information[to get account id to get
   
   ```
 3. 执行
-   ```shell
-   python3 pycfddns.py -token
-   ```
+  ```shell
+  python3 pycfddns.py -token
+  ```
 4. 设置定时任务
   ```shell
   crontab -e
