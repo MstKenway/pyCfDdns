@@ -271,10 +271,10 @@ def print_usage():
     print("Usage: python3 pycfdns.py -h/-token/-keys")
 
 
-def update_by_token():
+def update_by_token(force=False):
     cur_ip = get_current_ip()
     dns_ip = query_dns_ip(record_name)
-    if cur_ip == dns_ip:
+    if cur_ip == dns_ip and not force:
         print("Nothing to do.")
     else:
         result = request_update_by_token(cur_ip)
@@ -293,7 +293,10 @@ def main():
     if '-h' in sys.argv:
         print_usage()
     elif '-token' in sys.argv:
-        update_by_token()
+        if '-f' in sys.argv:
+            update_by_token(True)
+        else:
+            update_by_token()
     elif '-keys' in sys.argv:
         print("To be supported in the future.")
 
