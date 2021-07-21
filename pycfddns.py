@@ -14,7 +14,7 @@ name are also needed. It is ok without optional information but it is recommende
 less information is given here, the more privilege the token should be set. If zone id is given, only right to edit dns
 record is needed while if every optional information is missing, it needs rights to edit dns record, to read zone
 details[to get zone id] and to read account information[to get account id to get zone id].)
-3. python3 pycfddns.py -token
+3. python3 pycfddns_dev.py -token
 4. set a timing function to check the current ip periodically.(like using crond)
 """
 import datetime
@@ -99,7 +99,7 @@ def check_api_token():
     req = request.Request(url="https://api.cloudflare.com/client/v4/user/tokens/verify", headers=h)
     try:
         with request.urlopen(req) as resp:
-            content_raw = resp.read()
+            content_raw = resp.read().decode('utf-8')
         content = json.loads(content_raw)
         if not content['success']:
             print("Fail to verify the token. Check the token and run script again.", file=sys.stderr)
@@ -118,7 +118,7 @@ def get_account_id_by_token(acc_name: str) -> str:
                           headers=h)
     try:
         with request.urlopen(req) as resp:
-            content_raw = resp.read()
+            content_raw = resp.read().decode('utf-8')
         content = json.loads(content_raw)
         for item in content['result']:
             if acc_name in item['name']:
@@ -136,7 +136,7 @@ def get_zone_id_by_token(z_name: str, acc_name, acc_id):
                           data=parse.urlencode(data).encode('utf-8'), method='GET')
     try:
         with  request.urlopen(req) as resp:
-            content_raw = resp.read()
+            content_raw = resp.read().decode('utf-8')
         content = json.loads(content_raw)
         for item in content['result']:
             if z_name == item['name']:
@@ -154,7 +154,7 @@ def get_record_id_by_token(z_id: str, rec_name: str):
                           data=parse.urlencode(data).encode('utf-8'), method='GET')
     try:
         with  request.urlopen(req) as resp:
-            content_raw = resp.read()
+            content_raw = resp.read().decode('utf-8')
         content = json.loads(content_raw)
         for item in content['result']:
             if rec_name == item['name']:
@@ -166,7 +166,7 @@ def get_record_id_by_token(z_id: str, rec_name: str):
 
 def log_to_file(line: str):
     with open(log_file, "a") as f:
-        f.write(str(datetime.datetime.now())+ "\t")
+        f.write(str(datetime.datetime.now()) + "\t")
         f.write(line)
         f.write("\n")
 
@@ -261,7 +261,7 @@ def request_update_by_token(new_ip: str) -> bool:
                           data=json.dumps(data).encode('utf-8'), method='PUT')
     try:
         with  request.urlopen(req) as resp:
-            content_raw = resp.read()
+            content_raw = resp.read().decode('utf-8')
         content = json.loads(content_raw)
         return content['success']
     except Exception as e:
