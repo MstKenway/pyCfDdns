@@ -45,6 +45,10 @@ details[to get zone id] and to read account information[to get account id to get
   */2 * * * * python3 /etc/pycfddns/pycfddns.py > /dev/null 2>&1
   ```
 ---
+### 优势
+1. 无第三方库依赖，安装简单
+2. 使用Token为主的方式更新DDNS，更安全
+---
 附上[生成Token教程](https://support.cloudflare.com/hc/zh-cn/articles/200167836-%E7%AE%A1%E7%90%86-API-%E4%BB%A4%E7%89%8C%E5%92%8C%E5%AF%86%E9%92%A5)   
 选择DNS模板  
 需要：  
