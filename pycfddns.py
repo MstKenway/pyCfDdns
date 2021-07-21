@@ -40,6 +40,7 @@ account_id = ""
 record_id = ""
 
 # ---------------- Some Variables ------------------------
+version = '0.0.1'
 log_file = "ip_log"
 config_file = "cloudflare.ids"
 CUR_IP_SRC = ["ip.sb", "cip.cc", "ifconfig.me", "api.ipify.org", "ifconfig.co"]
@@ -273,6 +274,10 @@ def print_usage():
     print("Usage: python3 pycfdns.py -h/-token/-keys")
 
 
+def print_version():
+    print("Current Version: ", version)
+
+
 def update_by_token(force=False):
     cur_ip = get_current_ip()
     dns_ip = query_dns_ip(record_name)
@@ -293,7 +298,10 @@ def main():
         print_usage()
         exit(1)
     if '-h' in sys.argv:
+        print_version()
         print_usage()
+    elif '-v' in sys.argv:
+        print_version()
     elif '-token' in sys.argv:
         if '-f' in sys.argv:
             update_by_token(True)
@@ -301,6 +309,8 @@ def main():
             update_by_token()
     elif '-keys' in sys.argv:
         print("To be supported in the future.")
+    else:
+        print('Please use proper parameters.')
 
 
 if __name__ == '__main__':
