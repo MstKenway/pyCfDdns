@@ -1,5 +1,5 @@
 # pyCfDdns
-a python script to update ddns
+a python script to update ddns. Version: `0.0.1`
 
 ---
 ## Some introduction
