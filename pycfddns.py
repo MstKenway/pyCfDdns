@@ -40,7 +40,7 @@ account_id = ""
 record_id = ""
 
 # ---------------- Some Variables ------------------------
-version = '0.0.1'
+version = '0.0.2'
 log_file = "ip_log"
 config_file = "cloudflare.ids"
 CUR_IP_SRC = ["ip.sb", "cip.cc", "ifconfig.me", "api.ipify.org", "ifconfig.co"]
@@ -271,7 +271,7 @@ def request_update_by_token(new_ip: str) -> bool:
 
 
 def print_usage():
-    print("Usage: python3 pycfdns.py -h/-token/-keys")
+    print("Usage: python3 pycfdns.py [-h] [-f] -token/-keys ")
 
 
 def print_version():
