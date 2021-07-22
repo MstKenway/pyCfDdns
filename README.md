@@ -47,6 +47,8 @@ details[to get zone id] and to read account information[to get account id to get
 ---
 ### 参数
 ```
+pycfdns.py [-h] [-f] -token/-keys 
+
 -h help information/说明文档  
 -token update ddns by token(either token or keys are required)/使用token方式更新ddns(token与keys需要二选一，优先使用token)
 -keys update ddns by keys/使用个人私钥更新ddns   
