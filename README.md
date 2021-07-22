@@ -48,7 +48,7 @@ details[to get zone id] and to read account information[to get account id to get
 ### 参数
 ```
 -h help information/说明文档  
--token update ddns by token/使用token方式更新ddns  
+-token update ddns by token(either token or keys are required)/使用token方式更新ddns(token与keys需要二选一，优先使用token)
 -keys update ddns by keys/使用个人私钥更新ddns   
 -f force to update ddns/强制更新ddns记录，无论当前解析的ip与待更新ip是否相等  
 ```
