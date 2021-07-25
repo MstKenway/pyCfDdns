@@ -42,7 +42,11 @@ details[to get zone id] and to read account information[to get account id to get
   ```
   填写
   ```shell
-  */2 * * * * python3 /etc/pycfddns/pycfddns.py > /dev/null 2>&1
+  */2 * * * * python3 /etc/pycfddns/pycfddns.py -token > /dev/null 2>&1
+  
+  或者
+  
+  */2 * * * * python3 /etc/pycfddns/pycfddns.py -keys > /dev/null 2>&1
   ```
 ---
 ### 参数
