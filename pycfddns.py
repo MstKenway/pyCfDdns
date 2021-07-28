@@ -14,7 +14,7 @@ name are also needed. It is ok without optional information but it is recommende
 less information is given here, the more privilege the token should be set. If zone id is given, only right to edit dns
 record is needed while if every optional information is missing, it needs rights to edit dns record, to read zone
 details[to get zone id] and to read account information[to get account id to get zone id].)
-3. python3 pycfddns_dev.py -token
+3. python3 pycfddns_dev.py -token [-f]
 4. set a timing function to check the current ip periodically.(like using crond)
 """
 import datetime
@@ -22,6 +22,7 @@ import json
 import re
 import socket
 import sys
+import traceback
 import urllib.error
 from os.path import exists
 from urllib import request, parse
@@ -40,7 +41,7 @@ account_id = ""
 record_id = ""
 
 # ---------------- Some Variables ------------------------
-version = '0.0.2'
+version = '0.0.3'
 log_file = "ip_log"
 config_file = "cloudflare.ids"
 CUR_IP_SRC = ["ip.sb", "cip.cc", "ifconfig.me", "api.ipify.org", "ifconfig.co"]
@@ -74,14 +75,15 @@ def get_current_ip() -> str:
             if result:
                 ip = result
                 break
-        except urllib.error.HTTPError as e:
-            if e.errno == 404:
-                print(404)
+        except urllib.error.HTTPError as he:
+            if he.errno == 404:
+                print("Response status of {} is 404".format(src))
             else:
-                print("Something error while catch ip from ", src)
-                print(e)
+                print("Something error while catching ip from {}".format(src))
+                print(he)
         except Exception as e:
-            print(e)
+            print("Error in getting current ip:", e, file=sys.stderr)
+            traceback.print_exc()
     return ip
 
 
@@ -90,7 +92,8 @@ def query_dns_ip(dns: str) -> str:
     try:
         result = socket.gethostbyname(dns)
     except Exception as e:
-        print(e, file=sys.stderr)
+        print("Error in getting dns resolving:", e, file=sys.stderr)
+        traceback.print_exc()
     return result
 
 
@@ -107,7 +110,8 @@ def check_api_token():
             exit(1)
         return True
     except Exception as e:
-        print(e, file=sys.stderr)
+        print("Error in checking token:", e, file=sys.stderr)
+        traceback.print_exc()
         exit(1)
     return False
 
@@ -125,7 +129,8 @@ def get_account_id_by_token(acc_name: str) -> str:
             if acc_name in item['name']:
                 return item['id']
     except Exception as e:
-        print(e, file=sys.stderr)
+        print("Error in getting account id by token:", e, file=sys.stderr)
+        traceback.print_exc()
     return ''
 
 
@@ -143,7 +148,8 @@ def get_zone_id_by_token(z_name: str, acc_name, acc_id):
             if z_name == item['name']:
                 return item['id']
     except Exception as e:
-        print(e, file=sys.stderr)
+        print("Error in getting zone id by token:", e, file=sys.stderr)
+        traceback.print_exc()
     return ''
 
 
@@ -154,22 +160,27 @@ def get_record_id_by_token(z_id: str, rec_name: str):
     req = request.Request(url="https://api.cloudflare.com/client/v4/zones/" + z_id + "/dns_records", headers=h,
                           data=parse.urlencode(data).encode('utf-8'), method='GET')
     try:
-        with  request.urlopen(req) as resp:
+        with request.urlopen(req) as resp:
             content_raw = resp.read().decode('utf-8')
         content = json.loads(content_raw)
         for item in content['result']:
             if rec_name == item['name']:
                 return item['id']
     except Exception as e:
-        print(e, file=sys.stderr)
+        print("Error in getting record id by token:", e, file=sys.stderr)
+        traceback.print_exc()
     return ''
 
 
 def log_to_file(line: str):
-    with open(log_file, "a") as f:
-        f.write(str(datetime.datetime.now()) + "\t")
-        f.write(line)
-        f.write("\n")
+    try:
+        with open(log_file, "a") as f:
+            f.write(str(datetime.datetime.now()) + "\t")
+            f.write(line)
+            f.write("\n")
+    except Exception as e:
+        print("Error in logging to file:", e, file=sys.stderr)
+        traceback.print_exc()
 
 
 def get_config(type_name: str) -> str:
@@ -182,7 +193,8 @@ def get_config(type_name: str) -> str:
             return ''
         return content[type_name]
     except Exception as e:
-        print(e, file=sys.stderr)
+        print("Error in getting configures:", e, file=sys.stderr)
+        traceback.print_exc()
     return ''
 
 
@@ -196,7 +208,8 @@ def save_config(type_name: str, type_value):
         with open(config_file, "w") as f:
             json.dump(data, f)  # type:dict
     except Exception as e:
-        print(e, file=sys.stderr)
+        print("Error in updating configures:", e, file=sys.stderr)
+        traceback.print_exc()
 
 
 def check_account_id():
@@ -233,21 +246,26 @@ def check_zone_id():
         return zone_id
 
 
-def check_record_id(z_id: str):
-    if not record_id:
-        ret = get_config('record_id')
-        if not ret:
-            rec_id = get_record_id_by_token(z_id, record_name)
-            if not rec_id:
-                print("Can not get record id! Check the configure and run again.", file=sys.stderr)
-                exit(2)
-            save_config('record_id', rec_id)
-            return rec_id
-        else:
-            return ret
-
+def check_record_id(z_id: str, force: bool = False):
+    """
+    get record id from cf or local settings
+    :param z_id:
+    :param force:  if set as True, force to get record id from cf instead of local settings/file
+    :return:
+    """
+    r_id_saved = get_config('record_id')
+    r_name_saved = get_config('record_name')
+    if not r_id_saved or not r_name_saved or r_name_saved != record_name or force:
+        rec_id = get_record_id_by_token(z_id, record_name)
+        if not rec_id:
+            print("Can not get record id! Check the configure and run again.", file=sys.stderr)
+            exit(2)
+        save_config('record_id', rec_id)
+        save_config('record_name', record_name)
+        log_to_file("record id changed. New record name:{}".format(record_name))
+        return rec_id
     else:
-        return record_id
+        return r_id_saved
 
 
 def request_update_by_token(new_ip: str) -> bool:
@@ -265,8 +283,27 @@ def request_update_by_token(new_ip: str) -> bool:
             content_raw = resp.read().decode('utf-8')
         content = json.loads(content_raw)
         return content['success']
+    except urllib.error.HTTPError as he:
+        # if record name changed while config wasn't changed, try to get record id to recover
+        if he.errno == 400:
+            rec_id = check_record_id(z_id, force=True)
+            req = request.Request(url="https://api.cloudflare.com/client/v4/zones/" + z_id + "/dns_records/" + rec_id,
+                                  headers=h,
+                                  data=json.dumps(data).encode('utf-8'), method='PUT')
+            try:
+                with  request.urlopen(req) as resp:
+                    content_raw = resp.read().decode('utf-8')
+                content = json.loads(content_raw)
+                return content['success']
+            except Exception as e:
+                print("Error in updating by token:", e, file=sys.stderr)
+                traceback.print_exc()
+        else:
+            print("Error in updating by token:", he, file=sys.stderr)
+            traceback.print_exc()
     except Exception as e:
-        print(e, file=sys.stderr)
+        print("Error in updating by token:", e, file=sys.stderr)
+        traceback.print_exc()
     return False
 
 
