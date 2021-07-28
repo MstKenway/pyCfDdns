@@ -1,5 +1,5 @@
 # pyCfDdns
-a python script to update ddns. Version: `0.0.2`
+a python script to update ddns. Version: `0.0.3`
 
 ---
 ## Some introduction
@@ -58,6 +58,10 @@ pycfdns.py [-h] [-f] -token/-keys
 -keys update ddns by keys/使用个人私钥更新ddns   
 -f force to update ddns/强制更新ddns记录，无论当前解析的ip与待更新ip是否相等  
 ```
+
+---
+### 更新记录：
+v0.0.3: 更新了报错内容，在纠错时获得更多信息；新增：当使用了新的记录（record name）时，record id会随之一起变动。
 
 ---
 ### 优势
